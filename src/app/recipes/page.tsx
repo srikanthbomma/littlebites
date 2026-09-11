@@ -286,8 +286,38 @@ function RecipesInner() {
         {!loading && all.length === 0 && (
           <div className="card-shadow rounded-3xl bg-white p-8 text-center">
             <p className="text-4xl">🍛</p>
-            <p className="mt-2 text-sm font-black text-cocoa-900">No recipes found</p>
-            <p className="mt-1 text-xs font-bold text-cocoa-500">Try a different search or filter.</p>
+            <p className="mt-2 text-sm font-black text-cocoa-900">
+              {totalCount === 0 ? "Database not seeded yet" : "No recipes found"}
+            </p>
+            <p className="mt-1 text-xs font-bold text-cocoa-500">
+              {totalCount === 0
+                ? "Your database is connected, but the 68 recipes haven't been loaded into it yet."
+                : "Try a different search or filter."}
+            </p>
+            {totalCount === 0 && (
+              <button
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    await fetch("/api/seed");
+                    // Refresh meta counts and recipes
+                    const metaRes = await fetch("/api/recipes?meta=1");
+                    const metaData = await metaRes.json();
+                    setCountries(metaData);
+                    const recipesRes = await fetch("/api/recipes");
+                    const recipesData = await recipesRes.json();
+                    setAll(recipesData);
+                  } catch {
+                    /* ignore */
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                className="pressable mt-4 inline-flex items-center gap-2 rounded-2xl bg-coral-500 px-5 py-3 text-sm font-black text-white"
+              >
+                <Sparkles size={16} /> Load 68 World Recipes (1-Click)
+              </button>
+            )}
           </div>
         )}
       </div>

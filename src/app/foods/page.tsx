@@ -180,10 +180,36 @@ function FoodsInner() {
         {!loading && visible.length === 0 && (
           <div className="card-shadow rounded-3xl bg-white p-8 text-center">
             <p className="text-4xl">🔍</p>
-            <p className="mt-2 text-sm font-black text-cocoa-900">No foods found</p>
-            <p className="mt-1 text-xs font-bold text-cocoa-500">
-              {favOnly ? "Tap the heart on any food to save it here." : "Try a different search or filter."}
+            <p className="mt-2 text-sm font-black text-cocoa-900">
+              {all.length === 0 ? "Database not seeded yet" : "No foods found"}
             </p>
+            <p className="mt-1 text-xs font-bold text-cocoa-500">
+              {all.length === 0
+                ? "Your database is connected, but the 76 foods haven't been loaded yet."
+                : favOnly
+                  ? "Tap the heart on any food to save it here."
+                  : "Try a different search or filter."}
+            </p>
+            {all.length === 0 && (
+              <button
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    await fetch("/api/seed");
+                    const res = await fetch("/api/foods");
+                    const data = await res.json();
+                    setAll(data);
+                  } catch {
+                    /* ignore */
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                className="pressable mt-4 inline-flex items-center gap-2 rounded-2xl bg-coral-500 px-5 py-3 text-sm font-black text-white"
+              >
+                <Sparkles size={16} /> Load 76 Foods (1-Click)
+              </button>
+            )}
           </div>
         )}
       </div>

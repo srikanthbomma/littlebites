@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { and, asc, ilike, or, eq, type SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { foods } from "@/db/schema";
+import { ensureDatabaseSeeded } from "@/lib/auto-seed";
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
@@ -9,30 +10,48 @@ export async function GET(req: NextRequest) {
   const allergensOnly = req.nextUrl.searchParams.get("allergens") === "1";
   const ironOnly = req.nextUrl.searchParams.get("iron") === "1";
 
-  const conds: SQL[] = [];
-  if (q) {
-    conds.push(or(ilike(foods.name, `%${q}%`), ilike(foods.category, `%${q}%`)) as SQL);
+  async function fetchRows() {
+    const conds: SQL[] = [];
+    if (q) {
+      conds.push(or(ilike(foods.name, `%${q}%`), ilike(foods.category, `%${q}%`)) as SQL);
+    }
+    if (category) conds.push(eq(foods.category, category));
+    if (allergensOnly) conds.push(eq(foods.isAllergen, true));
+    if (ironOnly) conds.push(eq(foods.isIronRich, true));
+
+    return await db
+      .select({
+        id: foods.id,
+        name: foods.name,
+        slug: foods.slug,
+        category: foods.category,
+        emoji: foods.emoji,
+        introAgeText: foods.introAgeText,
+        isAllergen: foods.isAllergen,
+        allergenName: foods.allergenName,
+        chokingRisk: foods.chokingRisk,
+        isIronRich: foods.isIronRich,
+      })
+      .from(foods)
+      .where(conds.length ? and(...conds) : undefined)
+      .orderBy(asc(foods.name));
   }
-  if (category) conds.push(eq(foods.category, category));
-  if (allergensOnly) conds.push(eq(foods.isAllergen, true));
-  if (ironOnly) conds.push(eq(foods.isIronRich, true));
 
-  const rows = await db
-    .select({
-      id: foods.id,
-      name: foods.name,
-      slug: foods.slug,
-      category: foods.category,
-      emoji: foods.emoji,
-      introAgeText: foods.introAgeText,
-      isAllergen: foods.isAllergen,
-      allergenName: foods.allergenName,
-      chokingRisk: foods.chokingRisk,
-      isIronRich: foods.isIronRich,
-    })
-    .from(foods)
-    .where(conds.length ? and(...conds) : undefined)
-    .orderBy(asc(foods.name));
-
-  return NextResponse.json(rows);
+  try {
+    let rows = await fetchRows();
+    if (rows.length === 0 && !q && !category) {
+      await ensureDatabaseSeeded();
+      rows = await fetchRows();
+    }
+    return NextResponse.json(rows);
+  } catch (err: unknown) {
+    console.error("Error in /api/foods, auto-seeding:", err);
+    try {
+      await ensureDatabaseSeeded();
+      const rows = await fetchRows();
+      return NextResponse.json(rows);
+    } catch {
+      return NextResponse.json([], { status: 200 });
+    }
+  }
 }
