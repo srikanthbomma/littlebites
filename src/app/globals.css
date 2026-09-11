@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Nunito", ui-rounded, system-ui, -apple-system, sans-serif;
+
+  --color-cream-50: #fffbf5;
+  --color-cream-100: #fff6ea;
+  --color-cream-200: #fcebd3;
+  --color-cream-300: #f6d9ae;
+
+  --color-coral-50: #fff1ec;
+  --color-coral-100: #ffddd0;
+  --color-coral-200: #ffb79e;
+  --color-coral-500: #f0562a;
+  --color-coral-600: #d64720;
+  --color-coral-700: #b03a18;
+
+  --color-leaf-50: #eef7ee;
+  --color-leaf-100: #ddf2dc;
+  --color-leaf-200: #bce5ba;
+  --color-leaf-500: #4c8c4a;
+  --color-leaf-600: #3a7038;
+  --color-leaf-700: #2e5a2d;
+
+  --color-sun-200: #ffe6a3;
+  --color-sun-300: #ffd97a;
+  --color-sun-400: #ffc53d;
+  --color-sun-500: #f0a818;
+
+  --color-berry-100: #f9e0e7;
+  --color-berry-500: #c24b6b;
+  --color-berry-600: #a33a56;
+
+  --color-cocoa-400: #a98a76;
+  --color-cocoa-500: #7a5c4b;
+  --color-cocoa-700: #4a382c;
+  --color-cocoa-900: #33241a;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--color-cream-100);
+  color: var(--color-cocoa-900);
+  font-family: var(--font-sans);
+  overscroll-behavior-y: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+input,
+select,
+textarea {
+  font-size: 16px; /* prevents iOS zoom on focus */
+}
+
+.card-shadow {
+  box-shadow: 0 2px 12px rgba(51, 36, 26, 0.07);
+}
+
+.pressable {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.pressable:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.animate-float-soft {
+  animation: float-soft 4s ease-in-out infinite;
+}
+
+@keyframes pop-in {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.animate-pop-in {
+  animation: pop-in 0.18s ease-out;
+}

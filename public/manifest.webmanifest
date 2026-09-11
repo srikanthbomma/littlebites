@@ -1,0 +1,26 @@
+{
+  "name": "LittleBites — Starting Solids, Made Simple",
+  "short_name": "LittleBites",
+  "description": "Food database, serving guides, allergen tracker and meal diary for starting solids.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF6EA",
+  "theme_color": "#F0562A",
+  "categories": ["lifestyle", "health", "parenting"],
+  "icons": [
+    {
+      "src": "/icons/app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
